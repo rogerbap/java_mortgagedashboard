@@ -1,0 +1,30 @@
+/node_modules
+node_modules
+.env
+/.env
+# .gitignore
+
+# Java / Spring Boot
+target/
+*.log
+*.class
+*.jar
+*.war
+*.iml
+.idea/
+*.swp
+
+# Node / React
+node_modules/
+build/
+.env
+
+# Docker
+*.pid
+*.db
+*.sqlite
+
+# OS / Editor junk
+.DS_Store
+Thumbs.db
+.vscode/
