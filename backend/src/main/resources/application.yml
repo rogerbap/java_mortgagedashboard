@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: mortgage-backend-api
+    
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2database.Driver
+    username: sa
+    password: 
+    
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      
+  sql:
+    init:
+      enabled: false
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+logging:
+  level:
+    com.lender.mortgage: INFO
+    org.hibernate.SQL: DEBUG

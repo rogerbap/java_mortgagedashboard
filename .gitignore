@@ -27,3 +27,20 @@ build/
 .DS_Store
 Thumbs.db
 .vscode/
+
+.env
+application-prod.yml 
+application-dev.yml
+application-test.yml
+application.yml
+docker-compose.dev.yml
+docker-compose.prod.yml
+docker-compose.yml
+# SSL certificates and keys
+*.p12
+*.keystore
+*.jks
+*.pem
+*.crt
+*.key
+/database
