@@ -1,5 +1,5 @@
 -- =============================================================================
--- Mortgage Loan Dashboard - Main Database Schema
+-- Mortgage Loan Dashboard - Complete Database Schema
 -- Database: Oracle 19c+
 -- =============================================================================
 

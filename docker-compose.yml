@@ -1,9 +1,8 @@
 version: '3.8'
-
 services:
   # Oracle Database
   oracle-db:
-    image: gvenzl/oracle-xe:21-slim
+    image: gvenzl/oracle-free:latest
     container_name: mortgage-oracle-db
     environment:
       ORACLE_PASSWORD: oracle123
@@ -14,14 +13,15 @@ services:
       - "1521:1521"
     volumes:
       - oracle_data:/opt/oracle/oradata
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-      - ./database/sample-data.sql:/docker-entrypoint-initdb.d/02-sample-data.sql
+      # - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      # - ./database/sample-data.sql:/docker-entrypoint-initdb.d/02-sample-data.sql
+      # - ./database/stored-procedures.sql:/docker-entrypoint-initdb.d/03-stored-procedures.sql
     healthcheck:
-      test: ["CMD", "sqlplus", "-L", "mortgage_user/mortgage_pass@localhost:1521/XE", "@/dev/null"]
+      test: ["CMD", "sqlplus", "-L", "mortgage_user/mortgage_pass@localhost:1521/MORTGAGEDB", "@/dev/null"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 60s
+      start_period: 120s
     networks:
       - mortgage-network
     restart: unless-stopped
@@ -33,11 +33,11 @@ services:
       dockerfile: Dockerfile
     container_name: mortgage-backend
     environment:
-      SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@oracle-db:1521:XE
-      SPRING_DATASOURCE_USERNAME: mortgage_user
-      SPRING_DATASOURCE_PASSWORD: mortgage_pass
-      JWT_SECRET: myVerySecretKeyForProductionUse123!
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE:-dev}
+      DATABASE_URL: jdbc:oracle:thin:@oracle-db:1521:MORTGAGEDB
+      DATABASE_USERNAME: mortgage_user
+      DATABASE_PASSWORD: mortgage_pass
+      JWT_SECRET: ${JWT_SECRET:-myVerySecretKeyForProductionUse123!}
       FILE_STORAGE_DIR: /app/uploads
     ports:
       - "8080:8080"
@@ -48,7 +48,7 @@ services:
       oracle-db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -65,7 +65,7 @@ services:
     container_name: mortgage-frontend
     environment:
       REACT_APP_API_BASE_URL: http://localhost:8080/api
-      REACT_APP_ENVIRONMENT: development
+      REACT_APP_ENVIRONMENT: ${REACT_ENVIRONMENT:-development}
     ports:
       - "3000:3000"
     depends_on:
@@ -77,7 +77,7 @@ services:
       - mortgage-network
     restart: unless-stopped
 
-  # Redis (for session management and caching - optional)
+  # Redis (for session management and caching)
   redis:
     image: redis:7-alpine
     container_name: mortgage-redis
@@ -85,30 +85,12 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes --requirepass redis123
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis123}
     healthcheck:
       test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
       interval: 30s
       timeout: 10s
       retries: 3
-    networks:
-      - mortgage-network
-    restart: unless-stopped
-
-  # Nginx (Reverse Proxy)
-  nginx:
-    image: nginx:alpine
-    container_name: mortgage-nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-      - ./nginx/logs:/var/log/nginx
-    depends_on:
-      - mortgage-backend
-      - mortgage-frontend
     networks:
       - mortgage-network
     restart: unless-stopped

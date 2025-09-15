@@ -1,34 +1,104 @@
-spring:
-  application:
-    name: mortgage-backend-api
-    
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2database.Driver
-    username: sa
-    password: 
-    
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-    
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-      
-  sql:
-    init:
-      enabled: false
-
 server:
   port: 8080
   servlet:
-    context-path: /api
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+  http2:
+    enabled: true
 
+spring:
+  application:
+    name: mortgage-loan-dashboard
+  
+  profiles:
+    active: dev
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.OracleDialect
+        format_sql: true
+        use_sql_comments: false
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
+  
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 50MB
+      file-size-threshold: 2KB
+  
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      adjust-dates-to-context-time-zone: false
+    default-property-inclusion: non_null
+
+# Default logging configuration
 logging:
   level:
     com.lender.mortgage: INFO
-    org.hibernate.SQL: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/mortgage-dashboard.log
+    max-size: 10MB
+    max-history: 30
+
+# Application specific configuration
+app:
+  jwt:
+    expiration: 86400000  # 24 hours in milliseconds
+    refresh-expiration: 604800000  # 7 days in milliseconds
+  
+  cors:
+    allowed-origins: http://localhost:3000,http://localhost:3001
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: "*"
+    allow-credentials: true
+    max-age: 3600
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when_authorized
+      roles: MANAGER
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    os:
+      enabled: true
+
+# Application info
+info:
+  app:
+    name: Mortgage Loan Dashboard
+    description: Comprehensive mortgage loan processing and management system
+    version: 1.0.0
+    developer: Development Team
+    contact: dev-team@lender.com
