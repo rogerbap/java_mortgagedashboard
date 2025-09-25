@@ -1,4 +1,4 @@
-ackage com.lender.mortgage.repository;
+package com.lender.mortgage.repository;
 
 import com.lender.mortgage.entity.User;
 import com.lender.mortgage.entity.enums.UserRole;
