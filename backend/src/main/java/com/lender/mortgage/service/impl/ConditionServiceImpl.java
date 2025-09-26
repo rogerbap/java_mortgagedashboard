@@ -53,7 +53,9 @@ public class ConditionServiceImpl implements ConditionService {
         condition.setDescription(request.getDescription());
         condition.setPriority(request.getPriority());
         condition.setStatus(ConditionStatus.PENDING);
-        condition.setDueDate(request.getDueDate());
+       if (request.getDueDate() != null) {
+    condition.setDueDate(request.getDueDate().atStartOfDay());
+}
         condition.setComments(request.getComments());
         condition.setCreatedBy(createdByEmail);
         

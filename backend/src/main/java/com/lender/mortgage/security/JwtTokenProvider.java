@@ -63,7 +63,7 @@ public class JwtTokenProvider {
     }
     
     public String getEmailFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
+        Claims claims = Jwts.parser()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
@@ -73,7 +73,7 @@ public class JwtTokenProvider {
     }
     
     public String getEmailFromRefreshToken(String refreshToken) {
-        Claims claims = Jwts.parserBuilder()
+        Claims claims = Jwts.parser()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(refreshToken)
@@ -88,7 +88,7 @@ public class JwtTokenProvider {
                 return false;
             }
             
-            Jwts.parserBuilder()
+            Jwts.parser()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token);
@@ -102,7 +102,7 @@ public class JwtTokenProvider {
     
     public boolean validateRefreshToken(String refreshToken) {
         try {
-            Claims claims = Jwts.parserBuilder()
+            Claims claims = Jwts.parser()
                     .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(refreshToken)

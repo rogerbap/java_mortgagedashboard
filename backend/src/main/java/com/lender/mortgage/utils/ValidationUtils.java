@@ -1,4 +1,4 @@
-package com.lender.mortgage.util;
+package com.lender.mortgage.utils;
 
 import java.math.BigDecimal;
 import java.util.regex.Pattern;

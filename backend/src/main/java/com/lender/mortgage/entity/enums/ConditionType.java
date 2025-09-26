@@ -1,18 +1,18 @@
 package com.lender.mortgage.entity.enums;
 
 public enum ConditionType {
-    INCOME_VERIFICATION("Income Verification", "Verify borrower income documentation"),
-    EMPLOYMENT_VERIFICATION("Employment Verification", "Confirm current employment status"),
-    APPRAISAL("Appraisal", "Property appraisal required"),
-    TITLE_WORK("Title Work", "Title search and insurance"),
-    INSURANCE("Insurance", "Property insurance documentation"),
-    BANK_STATEMENTS("Bank Statements", "Recent bank statements required"),
-    TAX_RETURNS("Tax Returns", "Tax return documentation"),
-    CREDIT_EXPLANATION("Credit Explanation", "Explanation for credit items"),
-    GIFT_LETTER("Gift Letter", "Gift fund documentation"),
-    SURVEY("Survey", "Property survey required"),
+    INCOME_VERIFICATION("Income Verification", "Verify borrower's income documentation"),
+    EMPLOYMENT_VERIFICATION("Employment Verification", "Verify borrower's employment status"),
+    ASSET_VERIFICATION("Asset Verification", "Verify borrower's assets and bank statements"),
+    CREDIT_EXPLANATION("Credit Explanation", "Explanation required for credit issues"),
+    PROPERTY_APPRAISAL("Property Appraisal", "Property appraisal required"),
+    INSURANCE("Insurance", "Property insurance documentation needed"),
+    TITLE_WORK("Title Work", "Title search and title insurance required"),
     HOA_DOCUMENTS("HOA Documents", "Homeowners association documentation"),
-    OTHER("Other", "Custom condition type");
+    SURVEY("Survey", "Property survey required"),
+    REPAIRS("Repairs", "Property repairs required before closing"),
+    LEGAL_REVIEW("Legal Review", "Legal documentation review required"),
+    OTHER("Other", "Other condition type");
 
     private final String displayName;
     private final String description;

@@ -11,7 +11,7 @@ import com.lender.mortgage.repository.DocumentRepository;
 import com.lender.mortgage.service.DocumentService;
 import com.lender.mortgage.service.LoanService;
 import com.lender.mortgage.service.UserService;
-import com.lender.mortgage.util.FileUtils;
+import com.lender.mortgage.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

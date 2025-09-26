@@ -1,4 +1,4 @@
-package com.lender.mortgage.util;
+package com.lender.mortgage.utils;
 
 import com.lender.mortgage.repository.LoanRepository;
 import org.springframework.beans.factory.annotation.Autowired;

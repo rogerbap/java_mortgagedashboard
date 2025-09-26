@@ -29,7 +29,7 @@ services:
   # Backend Application
   mortgage-backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: mortgage-backend
     environment:

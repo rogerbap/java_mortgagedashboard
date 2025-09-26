@@ -1,4 +1,4 @@
-package com.lender.mortgage.util;
+package com.lender.mortgage.utils;
 
 import com.lender.mortgage.exception.BadRequestException;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.lender.mortgage.util;
+package com.lender.mortgage.utils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

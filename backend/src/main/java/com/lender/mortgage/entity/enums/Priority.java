@@ -1,26 +1,19 @@
 package com.lender.mortgage.entity.enums;
 
 public enum Priority {
-    LOW("Low", 1, "#10B981"),
-    MEDIUM("Medium", 2, "#F59E0B"),
-    HIGH("High", 3, "#EF4444"),
-    URGENT("Urgent", 4, "#DC2626");
+    LOW("Low", "Low priority - can be completed later"),
+    MEDIUM("Medium", "Medium priority - should be completed soon"),
+    HIGH("High", "High priority - needs immediate attention"),
+    CRITICAL("Critical", "Critical priority - blocking loan progress");
 
     private final String displayName;
-    private final int level;
-    private final String colorCode;
+    private final String description;
 
-    Priority(String displayName, int level, String colorCode) {
+    Priority(String displayName, String description) {
         this.displayName = displayName;
-        this.level = level;
-        this.colorCode = colorCode;
+        this.description = description;
     }
 
     public String getDisplayName() { return displayName; }
-    public int getLevel() { return level; }
-    public String getColorCode() { return colorCode; }
-    
-    public boolean isHigherThan(Priority other) {
-        return this.level > other.level;
-    }
+    public String getDescription() { return description; }
 }
