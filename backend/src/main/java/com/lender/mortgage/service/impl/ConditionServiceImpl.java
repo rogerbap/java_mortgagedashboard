@@ -30,22 +30,22 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class ConditionServiceImpl implements ConditionService {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(ConditionServiceImpl.class);
-    
+
     @Autowired
     private LoanConditionRepository conditionRepository;
-    
+
     @Autowired
     private LoanService loanService;
-    
+
     @Autowired
     private UserService userService;
-    
+
     @Override
     public ConditionResponse createCondition(CreateConditionRequest request, String createdByEmail) {
         Loan loan = loanService.getLoanEntity(request.getLoanId());
-        
+
         LoanCondition condition = new LoanCondition();
         condition.setLoan(loan);
         condition.setType(request.getType());
@@ -53,28 +53,28 @@ public class ConditionServiceImpl implements ConditionService {
         condition.setDescription(request.getDescription());
         condition.setPriority(request.getPriority());
         condition.setStatus(ConditionStatus.PENDING);
-       if (request.getDueDate() != null) {
-    condition.setDueDate(request.getDueDate().atStartOfDay());
-}
+        if (request.getDueDate() != null) {
+            condition.setDueDate(request.getDueDate().atStartOfDay());
+        }
         condition.setComments(request.getComments());
         condition.setCreatedBy(createdByEmail);
-        
+
         if (request.getAssignedToId() != null) {
             User assignedTo = userService.getUserEntity(request.getAssignedToId());
             condition.setAssignedTo(assignedTo);
         }
-        
+
         LoanCondition savedCondition = conditionRepository.save(condition);
-        
+
         logger.info("Created condition {} for loan {}", savedCondition.getTitle(), loan.getLoanNumber());
-        
+
         return new ConditionResponse(savedCondition);
     }
-    
+
     @Override
     public ConditionResponse updateCondition(Long conditionId, UpdateConditionRequest request, String updatedByEmail) {
         LoanCondition condition = getConditionEntity(conditionId);
-        
+
         if (request.getTitle() != null) {
             condition.setTitle(request.getTitle());
         }
@@ -85,7 +85,7 @@ public class ConditionServiceImpl implements ConditionService {
             condition.setPriority(request.getPriority());
         }
         if (request.getDueDate() != null) {
-            condition.setDueDate(request.getDueDate());
+            condition.setDueDate(request.getDueDate().atStartOfDay());
         }
         if (request.getComments() != null) {
             condition.setComments(request.getComments());
@@ -97,23 +97,23 @@ public class ConditionServiceImpl implements ConditionService {
             User assignedTo = userService.getUserEntity(request.getAssignedToId());
             condition.setAssignedTo(assignedTo);
         }
-        
+
         condition.setLastModifiedBy(updatedByEmail);
-        
+
         LoanCondition savedCondition = conditionRepository.save(condition);
-        
+
         logger.info("Updated condition {}", savedCondition.getTitle());
-        
+
         return new ConditionResponse(savedCondition);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public ConditionResponse getConditionById(Long conditionId) {
         LoanCondition condition = getConditionEntity(conditionId);
         return new ConditionResponse(condition);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<ConditionResponse> getConditionsByLoan(Long loanId) {
@@ -123,7 +123,7 @@ public class ConditionServiceImpl implements ConditionService {
                 .map(ConditionResponse::new)
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Page<ConditionResponse> getConditionsByUser(Long userId, Pageable pageable) {
@@ -131,7 +131,7 @@ public class ConditionServiceImpl implements ConditionService {
         return conditionRepository.findByAssignedTo(user, pageable)
                 .map(ConditionResponse::new);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Page<ConditionResponse> getActiveConditionsByUser(Long userId, Pageable pageable) {
@@ -139,21 +139,21 @@ public class ConditionServiceImpl implements ConditionService {
         return conditionRepository.findActiveConditionsByUser(user, pageable)
                 .map(ConditionResponse::new);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Page<ConditionResponse> getConditionsByStatus(ConditionStatus status, Pageable pageable) {
         return conditionRepository.findByStatus(status, pageable)
                 .map(ConditionResponse::new);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Page<ConditionResponse> getActiveConditions(Pageable pageable) {
         return conditionRepository.findActiveConditions(pageable)
                 .map(ConditionResponse::new);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<ConditionResponse> getOverdueConditions() {
@@ -162,19 +162,19 @@ public class ConditionServiceImpl implements ConditionService {
                 .map(ConditionResponse::new)
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<ConditionResponse> getConditionsDueSoon(int daysAhead) {
         LocalDateTime startDate = LocalDateTime.now();
         LocalDateTime endDate = startDate.plusDays(daysAhead);
-        
+
         return conditionRepository.findConditionsDueSoon(startDate, endDate)
                 .stream()
                 .map(ConditionResponse::new)
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<ConditionResponse> getHighPriorityActiveConditions() {
@@ -183,100 +183,99 @@ public class ConditionServiceImpl implements ConditionService {
                 .map(ConditionResponse::new)
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     public ConditionResponse completeCondition(Long conditionId, String completedByEmail, String notes) {
         LoanCondition condition = getConditionEntity(conditionId);
-        
+
         if (!condition.canBeCompleted()) {
             throw new BadRequestException("Condition cannot be completed in current status: " + condition.getStatus());
         }
-        
+
         condition.markCompleted(completedByEmail);
         if (notes != null && !notes.trim().isEmpty()) {
             String existingComments = condition.getComments();
-            String newComments = existingComments != null ? 
-                existingComments + "\n" + notes : notes;
+            String newComments = existingComments != null ? existingComments + "\n" + notes : notes;
             condition.setComments(newComments);
         }
-        
+
         LoanCondition savedCondition = conditionRepository.save(condition);
-        
-        logger.info("Completed condition {} for loan {}", 
-                   savedCondition.getTitle(), savedCondition.getLoan().getLoanNumber());
-        
+
+        logger.info("Completed condition {} for loan {}",
+                savedCondition.getTitle(), savedCondition.getLoan().getLoanNumber());
+
         return new ConditionResponse(savedCondition);
     }
-    
+
     @Override
     public ConditionResponse waiveCondition(Long conditionId, String waivedByEmail, String reason) {
         LoanCondition condition = getConditionEntity(conditionId);
-        
+
         if (!condition.canBeCompleted()) {
             throw new BadRequestException("Condition cannot be waived in current status: " + condition.getStatus());
         }
-        
+
         condition.markWaived(waivedByEmail, reason);
-        
+
         LoanCondition savedCondition = conditionRepository.save(condition);
-        
-        logger.info("Waived condition {} for loan {} - Reason: {}", 
-                   savedCondition.getTitle(), savedCondition.getLoan().getLoanNumber(), reason);
-        
+
+        logger.info("Waived condition {} for loan {} - Reason: {}",
+                savedCondition.getTitle(), savedCondition.getLoan().getLoanNumber(), reason);
+
         return new ConditionResponse(savedCondition);
     }
-    
+
     @Override
     public ConditionResponse assignCondition(Long conditionId, Long userId, String assignedByEmail) {
         LoanCondition condition = getConditionEntity(conditionId);
         User assignedTo = userService.getUserEntity(userId);
-        
+
         condition.setAssignedTo(assignedTo);
         condition.setLastModifiedBy(assignedByEmail);
-        
+
         LoanCondition savedCondition = conditionRepository.save(condition);
-        
-        logger.info("Assigned condition {} to user {}", 
-                   savedCondition.getTitle(), assignedTo.getFullName());
-        
+
+        logger.info("Assigned condition {} to user {}",
+                savedCondition.getTitle(), assignedTo.getFullName());
+
         return new ConditionResponse(savedCondition);
     }
-    
+
     @Override
     public ConditionResponse updateConditionPriority(Long conditionId, Priority priority, String updatedByEmail) {
         LoanCondition condition = getConditionEntity(conditionId);
-        
+
         condition.setPriority(priority);
         condition.setLastModifiedBy(updatedByEmail);
-        
+
         LoanCondition savedCondition = conditionRepository.save(condition);
-        
-        logger.info("Updated condition {} priority to {}", 
-                   savedCondition.getTitle(), priority);
-        
+
+        logger.info("Updated condition {} priority to {}",
+                savedCondition.getTitle(), priority);
+
         return new ConditionResponse(savedCondition);
     }
-    
+
     @Override
     public void deleteCondition(Long conditionId, String deletedByEmail) {
         LoanCondition condition = getConditionEntity(conditionId);
-        
+
         if (condition.getStatus() == ConditionStatus.COMPLETED) {
             throw new BadRequestException("Cannot delete completed condition");
         }
-        
+
         conditionRepository.delete(condition);
-        
+
         logger.info("Deleted condition {} by user {}", condition.getTitle(), deletedByEmail);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public LoanCondition getConditionEntity(Long conditionId) {
         return conditionRepository.findById(conditionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Condition not found with id: " + conditionId));
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public boolean areAllConditionsSatisfied(Long loanId) {

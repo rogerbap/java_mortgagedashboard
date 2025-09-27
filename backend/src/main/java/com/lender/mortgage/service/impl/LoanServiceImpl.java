@@ -58,29 +58,28 @@ public class LoanServiceImpl implements LoanService {
     private UserRepository userRepository;
 
     @Override
-    public LoanResponse createLoan(CreateLoanRequest request, String createdByEmail) {
-        // Generate unique loan number
-        String loanNumber = generateLoanNumber();
-
-        // Create loan entity
-        Loan loan = new Loan();
-        loan.setLoanNumber(loanNumber);
-        loan.setLoanType(request.getLoanType());
-        loan.setLoanAmount(request.getLoanAmount());
-        loan.setInterestRate(request.getInterestRate());
-        loan.setLoanTermMonths(request.getLoanTermMonths());
-        loan.setStatus(LoanStatus.APPLICATION_STARTED);
-        loan.setApplicationDate(LocalDateTime.now());
+public LoanResponse createLoan(CreateLoanRequest request, String createdByEmail) {
+    // Generate unique loan number
+    String loanNumber = generateLoanNumber();
+    
+    // Create loan entity
+    Loan loan = new Loan();
+    loan.setLoanNumber(loanNumber);
+    loan.setLoanType(request.getLoanType());
+    loan.setLoanAmount(request.getLoanAmount());
+    loan.setInterestRate(request.getInterestRate());
+    loan.setLoanTermMonths(request.getLoanTermMonths());
+    loan.setStatus(LoanStatus.APPLICATION_STARTED);
+    loan.setApplicationDate(LocalDateTime.now());
+    
+    // Get current authenticated user and set as creator
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth != null && auth.isAuthenticated()) {
+        String currentUsername = auth.getName();
         User currentUser = userRepository.findByEmail(currentUsername)
-                .orElseThrow(() -> new RuntimeException("Current user not found"));
-      Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-if (auth != null && auth.isAuthenticated()) {
-    String currentUsername = auth.getName();
-    User currentUser = userRepository.findByEmail(currentUsername)
-        .orElseThrow(() -> new RuntimeException("Current user not found: " + currentUsername));
-    loan.setCreatedBy(currentUser);
-}
-
+            .orElseThrow(() -> new RuntimeException("Current user not found: " + currentUsername));
+        loan.setCreatedBy(currentUser);
+    }
         // Borrower information
         loan.setBorrowerFirstName(request.getBorrowerFirstName());
         loan.setBorrowerLastName(request.getBorrowerLastName());

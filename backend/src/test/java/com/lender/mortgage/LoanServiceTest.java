@@ -13,7 +13,7 @@ import com.lender.mortgage.exception.ResourceNotFoundException;
 import com.lender.mortgage.repository.LoanRepository;
 import com.lender.mortgage.repository.LoanStatusHistoryRepository;
 import com.lender.mortgage.service.impl.LoanServiceImpl;
-import com.lender.mortgage.util.LoanNumberGenerator;
+import com.lender.mortgage.utils.LoanNumberGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
